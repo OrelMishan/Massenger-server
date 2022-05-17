@@ -1,0 +1,59 @@
+﻿@model IEnumerable<ourServer.Models.Rate>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>
+    average:@if (Model.Count() > 0)@Model.Average(x => x.numRate) else{<text> 0</text>}
+</h1>
+
+<form asp-action="Search"> 
+    <input name="query"/>
+    <input type="submit" value="Search"/>
+</form>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.numRate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.stringRate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.date)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.numRate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.stringRate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.date)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
