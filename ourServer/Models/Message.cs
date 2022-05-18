@@ -5,8 +5,10 @@ namespace ourServer.Models
 {
     public class Message
     {
-        
-        public int Id { get; set; }
+        private static int numId = 1;
+
+        public int Id { get; set; } = numId++;
+       
         [Required]
         public string Content { get; set; }
 
