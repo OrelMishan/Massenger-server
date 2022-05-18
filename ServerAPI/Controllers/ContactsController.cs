@@ -21,7 +21,8 @@ namespace ServerAPI.Controllers
         [HttpGet]
         public IActionResult Get()
         {
-            //var q = contacts.GetALL().Find(x => x.Id == HttpContext.Session.GetString("username"));
+            if (HttpContext.Session.GetString("username") == null)
+                return BadRequest();
             var q = contacts.Get(HttpContext.Session.GetString("username"));
             return Ok(q.Contacts);
         }
@@ -222,6 +223,14 @@ namespace ServerAPI.Controllers
             contacts.Add(add);
             HttpContext.Session.SetString("username", id);
             return Created("register", add);
+        }
+
+        [HttpPost("logout")]
+        public IActionResult Logout()
+        {
+
+            HttpContext.Session.Clear();
+            return NoContent();
         }
     }
 }
