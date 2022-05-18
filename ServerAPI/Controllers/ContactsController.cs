@@ -22,7 +22,7 @@ namespace ServerAPI.Controllers
         public IActionResult Get()
         {
             //var q = contacts.GetALL().Find(x => x.Id == HttpContext.Session.GetString("username"));
-            var q = contacts.Get("Orel");
+            var q = contacts.Get(HttpContext.Session.GetString("username"));
             return Ok(q.Contacts);
         }
 
@@ -35,7 +35,7 @@ namespace ServerAPI.Controllers
                 //return to login
                 //}
             //var q = contacts.Get(HttpContext.Session.GetString("username"));
-            var q = contacts.Get("Orel");
+            var q = contacts.Get(HttpContext.Session.GetString("username"));
 
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
@@ -50,11 +50,11 @@ namespace ServerAPI.Controllers
         [HttpPost]
         public IActionResult Post(string id, string name, string server)
         {
-            var q = contacts.Get("Orel");
+            var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) != null){
                 return BadRequest(); 
             }
-            contacts.Update("Orel",new Contact() { Id = id, Name = name, Server = server });
+            contacts.Update(HttpContext.Session.GetString("username"), new Contact() { Id = id, Name = name, Server = server });
             return Ok();
         }
 
@@ -62,7 +62,7 @@ namespace ServerAPI.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(string id, string name, string server)
         {
-            var q = contacts.Get("Orel");
+            var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
                 return BadRequest();
@@ -70,7 +70,7 @@ namespace ServerAPI.Controllers
             var toDel = q.Contacts.Find(x => x.Id == id);
             Contact add = new Contact() { Id = id, Name = name, Server = server, Last = toDel.Last, Lastdate = toDel.Lastdate, Messages = toDel.Messages };
             q.Contacts.Remove(toDel);
-            contacts.Update("Orel", add);
+            contacts.Update(HttpContext.Session.GetString("username"), add);
             return Ok();
 
         }
@@ -79,7 +79,7 @@ namespace ServerAPI.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
-            var q = contacts.Get("Orel");
+            var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
                 return BadRequest();
@@ -93,7 +93,7 @@ namespace ServerAPI.Controllers
         [HttpGet("{id}/messages")]
         public IActionResult GetMessages(string id)
         {
-            var q = contacts.Get("Orel");
+            var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
                 return BadRequest();
@@ -103,7 +103,7 @@ namespace ServerAPI.Controllers
 
         [HttpPost("{id}/messages")]
         public IActionResult sentMessage(string id, string content){
-            var q = contacts.Get("Orel");
+            var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
                 return BadRequest();
@@ -117,7 +117,7 @@ namespace ServerAPI.Controllers
         [HttpGet("{id}/messages/{id2}")]
         public IActionResult GetMessages(string id, int id2)
         {
-            var q = contacts.Get("Orel");
+            var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
                 return BadRequest();
@@ -131,7 +131,7 @@ namespace ServerAPI.Controllers
         [HttpPut("{id}/messages/{id2}")]
         public IActionResult PutMessege(string id, int id2, string content)
         {
-            var q = contacts.Get("Orel");
+            var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
                 return BadRequest();
@@ -147,7 +147,7 @@ namespace ServerAPI.Controllers
         [HttpDelete("{id}/messages/{id2}")]
         public IActionResult DelMessage(string id, int id2)
         {
-            var q = contacts.Get("Orel");
+            var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
                 return BadRequest();
@@ -159,6 +159,69 @@ namespace ServerAPI.Controllers
                var del= q.Contacts.Find(x => x.Id == id).Messages.Find(x => x.Id == id2);
             q.Contacts.Find(x => x.Id == id).Messages.Remove(del);
             return NoContent();
+        }
+
+        [HttpPost("invitations")]
+        public IActionResult Invitation(string from,string to, string server)
+        {
+            Contact add = new Contact()
+            {
+                Id = from,
+                Server = server,
+                Messages = new List<Message>()
+            };
+            var q = contacts.Get(to);
+            if (q.Contacts.Find(x => x.Id == from)!=null)
+            {
+                return BadRequest();
+            }
+            q.Contacts.Add(add);
+            return Created("invitations",add);
+        }
+
+        [HttpPost("transfer")]
+        public IActionResult Transfer(string from, string to, string content)
+        {
+            Message add = new Message()
+            {
+                Content = content,
+                Sent = false,
+                Type = "text"
+            };
+            var q = contacts.Get(to).Contacts.Find(x=>x.Id ==from);
+            q.Messages.Add(add);
+            return Created("transfer", add);
+        }
+
+        [HttpPost("login")]
+        public IActionResult Login(string id)
+        {
+            var q = contacts.Get(id);
+            if (q == null)
+            {
+                return BadRequest();
+            }
+            HttpContext.Session.SetString("username", q.Id);
+            return NoContent();
+        }
+
+        [HttpPost("register")]
+        public IActionResult Register(string id,string password, string nickname,string? photo)
+        {
+            if (contacts.Get(id) != null)
+            {
+                return BadRequest();
+            }
+            User add = new User()
+            {
+                Id = id,
+                Password = password,
+                Photo = photo,
+                Name = nickname
+            };
+            contacts.Add(add);
+            HttpContext.Session.SetString("username", id);
+            return Created("register", add);
         }
     }
 }

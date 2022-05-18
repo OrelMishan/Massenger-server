@@ -17,7 +17,7 @@ namespace ourServer.Models
         [Required]
         public string Name { get; set; }
 
-        public List<Contact> Contacts { get; set; }
+        public List<Contact> Contacts { get; set; } = new List<Contact>();
 
         
     }

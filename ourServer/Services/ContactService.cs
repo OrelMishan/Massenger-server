@@ -23,9 +23,9 @@ namespace ourServer.Services
                    Last = "Here's a pic!",
                    Messages = new List<Message>()
                    {
-                       new Message() {Id=1, Sent = true, Type = "text", Content = "Hey, how are you?" },
-                       new Message() {Id=2, Sent = false, Type = "text", Content = "I'm great, i'm in Paris" },
-                       new Message() {Id=3, Sent = false, Type = "text", Content = "Here's a pic!" }
+                       new Message() { Sent = true, Type = "text", Content = "Hey, how are you?" },
+                       new Message() { Sent = false, Type = "text", Content = "I'm great, i'm in Paris" },
+                       new Message() { Sent = false, Type = "text", Content = "Here's a pic!" }
                    }
                },
                new Contact()
