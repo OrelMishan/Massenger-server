@@ -31,11 +31,8 @@ namespace ServerAPI.Controllers
         [HttpGet("{id}")]
         public IActionResult Get(string id)
         {
-            //if (HttpContext.Session.GetString("username") == null) {
-              //  return NotFound();
-                //return to login
-                //}
-            //var q = contacts.Get(HttpContext.Session.GetString("username"));
+            if (HttpContext.Session.GetString("username") == null)
+                return BadRequest();
             var q = contacts.Get(HttpContext.Session.GetString("username"));
 
             if (q.Contacts.Find(x => x.Id == id) == null)
@@ -51,6 +48,8 @@ namespace ServerAPI.Controllers
         [HttpPost]
         public IActionResult Post(string id, string name, string server)
         {
+            if (HttpContext.Session.GetString("username") == null)
+                return BadRequest();
             var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) != null){
                 return BadRequest(); 
@@ -63,6 +62,8 @@ namespace ServerAPI.Controllers
         [HttpPut("{id}")]
         public IActionResult Put(string id, string name, string server)
         {
+            if (HttpContext.Session.GetString("username") == null)
+                return BadRequest();
             var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
@@ -80,6 +81,8 @@ namespace ServerAPI.Controllers
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
+            if (HttpContext.Session.GetString("username") == null)
+                return BadRequest();
             var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
@@ -94,6 +97,8 @@ namespace ServerAPI.Controllers
         [HttpGet("{id}/messages")]
         public IActionResult GetMessages(string id)
         {
+            if (HttpContext.Session.GetString("username") == null)
+                return BadRequest();
             var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
@@ -104,6 +109,8 @@ namespace ServerAPI.Controllers
 
         [HttpPost("{id}/messages")]
         public IActionResult sentMessage(string id, string content){
+            if (HttpContext.Session.GetString("username") == null)
+                return BadRequest();
             var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
@@ -118,6 +125,8 @@ namespace ServerAPI.Controllers
         [HttpGet("{id}/messages/{id2}")]
         public IActionResult GetMessages(string id, int id2)
         {
+            if (HttpContext.Session.GetString("username") == null)
+                return BadRequest();
             var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
@@ -132,6 +141,8 @@ namespace ServerAPI.Controllers
         [HttpPut("{id}/messages/{id2}")]
         public IActionResult PutMessege(string id, int id2, string content)
         {
+            if (HttpContext.Session.GetString("username") == null)
+                return BadRequest();
             var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
@@ -148,6 +159,8 @@ namespace ServerAPI.Controllers
         [HttpDelete("{id}/messages/{id2}")]
         public IActionResult DelMessage(string id, int id2)
         {
+            if (HttpContext.Session.GetString("username") == null)
+                return BadRequest();
             var q = contacts.Get(HttpContext.Session.GetString("username"));
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
