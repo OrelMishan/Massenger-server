@@ -195,10 +195,14 @@ namespace ServerAPI.Controllers
         }
 
         [HttpPost("login")]
-        public IActionResult Login(string id)
+        public IActionResult Login(string id, string password)
         {
             var q = contacts.Get(id);
             if (q == null)
+            {
+                return BadRequest();
+            }
+            if (q.Password != password)
             {
                 return BadRequest();
             }
@@ -234,10 +238,3 @@ namespace ServerAPI.Controllers
         }
     }
 }
-
-
-
-
-
-
-//orel the king
