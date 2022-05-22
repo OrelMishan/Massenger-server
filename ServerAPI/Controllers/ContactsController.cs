@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using ourServer.Models;
 using ourServer.Services;
 using System;
@@ -10,6 +11,7 @@ using System.Threading.Tasks;
 
 namespace ServerAPI.Controllers
 {
+    [EnableCors("Allow All")]
     [Route("api/[controller]")]
     [ApiController]
     public class ContactsController : ControllerBase
@@ -213,13 +215,13 @@ namespace ServerAPI.Controllers
             var q = contacts.Get(id);
             if (q == null)
             {
-                return BadRequest();
+                return NotFound();
             }
             if (q.Password != password)
             {
-                return BadRequest();
+                return NotFound();
             }
-            HttpContext.Session.SetString("username", q.Id);
+        //    HttpContext.Session.SetString("username", q.Id);
             return NoContent();
         }
 
