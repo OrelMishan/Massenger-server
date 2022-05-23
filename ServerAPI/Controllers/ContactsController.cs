@@ -21,71 +21,78 @@ namespace ServerAPI.Controllers
 
         // GET: api/<ContactsController>
         [HttpGet]
-        public IActionResult Get()
+        public IActionResult Get(string username)
         {
-            if (HttpContext.Session.GetString("username") == null)
+            var q = contacts.Get(username);
+            if (q == null)
+            {
                 return BadRequest();
-            var q = contacts.Get(HttpContext.Session.GetString("username"));
+            }
             return Ok(q.Contacts);
         }
 
         // GET api/<ContactsController>/5
         [HttpGet("{id}")]
-        public IActionResult Get(string id)
+        public IActionResult Get(string id, string username)
         {
-            if (HttpContext.Session.GetString("username") == null)
-                return BadRequest();
-            var q = contacts.Get(HttpContext.Session.GetString("username"));
 
+            var q = contacts.Get(username);
+            if (q == null)
+            {
+                return BadRequest();
+            }
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
                 return NotFound();
             }
             return Ok(q.Contacts.Find(x => x.Id == id));
-
-
         }
 
         // POST api/<ContactsController>
         [HttpPost]
-        public IActionResult Post(string id, string name, string server)
+        public IActionResult Post([FromBody] Contact add, string username)
         {
-            if (HttpContext.Session.GetString("username") == null)
+            var q = contacts.Get(username);
+            if (q == null)
+            {
                 return BadRequest();
-            var q = contacts.Get(HttpContext.Session.GetString("username"));
-            if (q.Contacts.Find(x => x.Id == id) != null){
-                return BadRequest(); 
             }
-            contacts.Update(HttpContext.Session.GetString("username"), new Contact() { Id = id, Name = name, Server = server });
+            if (q.Contacts.Find(x => x.Id == add.Id) != null){
+                return BadRequest();
+            }
+            contacts.Update(username,add);
             return Ok();
         }
 
         // PUT api/<ContactsController>/5
         [HttpPut("{id}")]
-        public IActionResult Put(string id, string name, string server)
+        public IActionResult Put([FromBody] Contact edit, string username)
         {
-            if (HttpContext.Session.GetString("username") == null)
-                return BadRequest();
-            var q = contacts.Get(HttpContext.Session.GetString("username"));
-            if (q.Contacts.Find(x => x.Id == id) == null)
+            var q = contacts.Get(username);
+            if (q == null)
             {
                 return BadRequest();
             }
-            var toDel = q.Contacts.Find(x => x.Id == id);
-            Contact add = new Contact() { Id = id, Name = name, Server = server, Last = toDel.Last, Lastdate = toDel.Lastdate, Messages = toDel.Messages };
+            if (q.Contacts.Find(x => x.Id == edit.Id) == null)
+            {
+                return BadRequest();
+            }
+            var toDel = q.Contacts.Find(x => x.Id == edit.Id);
             q.Contacts.Remove(toDel);
-            contacts.Update(HttpContext.Session.GetString("username"), add);
+            contacts.Update( username,edit);
             return Ok();
 
         }
 
         // DELETE api/<ContactsController>/5
         [HttpDelete("{id}")]
-        public IActionResult Delete(string id)
+        public IActionResult Delete(string id,string username)
         {
-            if (HttpContext.Session.GetString("username") == null)
+            var q = contacts.Get(username);
+            if (q == null)
+            {
                 return BadRequest();
-            var q = contacts.Get(HttpContext.Session.GetString("username"));
+            }
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
                 return BadRequest();
@@ -97,26 +104,30 @@ namespace ServerAPI.Controllers
         }
 
         [HttpGet("{id}/messages")]
-        public IActionResult GetMessages(string id)
+        public IActionResult GetMessages(string id, string username)
         {
-            if (HttpContext.Session.GetString("username") == null)
-                return BadRequest();
-            var q = contacts.Get(HttpContext.Session.GetString("username"));
-            if (q.Contacts.Find(x => x.Id == id) == null)
+            var q = contacts.Get(username);
+            if (q == null)
             {
                 return BadRequest();
+            }
+            if (q.Contacts.Find(x => x.Id == id) == null)
+            {
+                return NotFound();
             }
             return Ok(q.Contacts.Find(x => x.Id == id).Messages);
         }
 
         [HttpPost("{id}/messages")]
-        public IActionResult sentMessage(string id, string content){
-            if (HttpContext.Session.GetString("username") == null)
-                return BadRequest();
-            var q = contacts.Get(HttpContext.Session.GetString("username"));
-            if (q.Contacts.Find(x => x.Id == id) == null)
+        public IActionResult sentMessage(string id, [FromBody] string content,string username){
+            var q = contacts.Get(username);
+            if (q == null)
             {
                 return BadRequest();
+            }
+            if (q.Contacts.Find(x => x.Id == id) == null)
+            {
+                return NotFound();
             }
             Message add = new Message() { Content = content, Type = "text", Sent = true };
             q.Contacts.Find(x => x.Id == id).Messages.Add(add);
@@ -125,30 +136,34 @@ namespace ServerAPI.Controllers
         }
 
         [HttpGet("{id}/messages/{id2}")]
-        public IActionResult GetMessages(string id, int id2)
+        public IActionResult GetMessages(string id, int id2,string username)
         {
-            if (HttpContext.Session.GetString("username") == null)
-                return BadRequest();
-            var q = contacts.Get(HttpContext.Session.GetString("username"));
-            if (q.Contacts.Find(x => x.Id == id) == null)
+            var q = contacts.Get(username);
+            if (q == null)
             {
                 return BadRequest();
             }
-            if(q.Contacts.Find(x => x.Id == id).Messages.Find(x => x.Id == id2)==null) {
+            if (q.Contacts.Find(x => x.Id == id) == null)
+            {
+                return NotFound();
+            }
+            if (q.Contacts.Find(x => x.Id == id).Messages.Find(x => x.Id == id2) == null) {
                 return BadRequest();
             }
             return Ok(q.Contacts.Find(x => x.Id == id).Messages.Find(x => x.Id == id2));
         }
 
         [HttpPut("{id}/messages/{id2}")]
-        public IActionResult PutMessege(string id, int id2, string content)
+        public IActionResult PutMessege(string id, int id2, [FromBody]string content, string username)
         {
-            if (HttpContext.Session.GetString("username") == null)
-                return BadRequest();
-            var q = contacts.Get(HttpContext.Session.GetString("username"));
-            if (q.Contacts.Find(x => x.Id == id) == null)
+            var q = contacts.Get(username);
+            if (q == null)
             {
                 return BadRequest();
+            }
+            if (q.Contacts.Find(x => x.Id == id) == null)
+            {
+                return NotFound();
             }
             if (q.Contacts.Find(x => x.Id == id).Messages.Find(x => x.Id == id2) == null)
             {
@@ -159,35 +174,41 @@ namespace ServerAPI.Controllers
         }
 
         [HttpDelete("{id}/messages/{id2}")]
-        public IActionResult DelMessage(string id, int id2)
+        public IActionResult DelMessage(string id, int id2, string username)
         {
-            if (HttpContext.Session.GetString("username") == null)
+            var q = contacts.Get(username);
+            if (q == null)
+            {
                 return BadRequest();
-            var q = contacts.Get(HttpContext.Session.GetString("username"));
+            }
             if (q.Contacts.Find(x => x.Id == id) == null)
             {
-                return BadRequest();
+                return NotFound();
             }
-            if (q.Contacts.Find(x => x.Id == id).Messages.Find(x => x.Id == id2) == null)
+            var del = q.Contacts.Find(x => x.Id == id).Messages.Find(x => x.Id == id2);
+            if (del == null)
             {
                 return BadRequest();
             }
-               var del= q.Contacts.Find(x => x.Id == id).Messages.Find(x => x.Id == id2);
             q.Contacts.Find(x => x.Id == id).Messages.Remove(del);
             return NoContent();
         }
 
         [HttpPost("invitations")]
-        public IActionResult Invitation(string from,string to, string server)
+        public IActionResult Invitation([FromBody] Invatation invatation)
         {
             Contact add = new Contact()
             {
-                Id = from,
-                Server = server,
-                Messages = new List<Message>()
+                Id = invatation.From,
+                Name = invatation.From,
+                Server = invatation.Server
             };
-            var q = contacts.Get(to);
-            if (q.Contacts.Find(x => x.Id == from)!=null)
+            var q = contacts.Get(invatation.To);
+            if (q == null)
+            {
+                return BadRequest();
+            }
+            if (q.Contacts.Find(x => x.Id == invatation.From)!=null)
             {
                 return BadRequest();
             }
@@ -196,60 +217,65 @@ namespace ServerAPI.Controllers
         }
 
         [HttpPost("transfer")]
-        public IActionResult Transfer(string from, string to, string content)
+        public IActionResult Transfer([FromBody] Transfer message)
         {
             Message add = new Message()
             {
-                Content = content,
+                Content = message.Content,
                 Sent = false,
                 Type = "text"
             };
-            var q = contacts.Get(to).Contacts.Find(x=>x.Id ==from);
-            q.Messages.Add(add);
+            var q = contacts.Get(message.To);
+            if (q == null)
+            {
+                return BadRequest();
+            }
+            if (q.Contacts.Find(x => x.Id == message.From) == null)
+            {
+                return BadRequest();
+            }
+            q.Contacts.Find(x=>x.Id==message.From).Messages.Add(add);
             return Created("transfer", add);
         }
 
-        [HttpPost("login")]
-        public IActionResult Login(string id, string password)
+        [HttpPost]
+        [Route("/api/contacts/login")]
+        public IActionResult Login([FromBody] Login login)
         {
-            var q = contacts.Get(id);
+            var q = contacts.Get(login.Username);
             if (q == null)
             {
                 return NotFound();
             }
-            if (q.Password != password)
+            if (q.Password != login.Password)
             {
                 return NotFound();
             }
-        //    HttpContext.Session.SetString("username", q.Id);
             return NoContent();
         }
 
-        [HttpPost("register")]
-        public IActionResult Register(string id,string password, string nickname,string? photo)
+        [HttpPost]
+        [Route("/api/contacts/register")]
+        public IActionResult Register([FromBody] User add)
         {
-            if (contacts.Get(id) != null)
+            if (contacts.Get(add.Id) != null)
             {
                 return BadRequest();
             }
-            User add = new User()
-            {
-                Id = id,
-                Password = password,
-                Photo = photo,
-                Name = nickname
-            };
             contacts.Add(add);
-            HttpContext.Session.SetString("username", id);
             return Created("register", add);
         }
 
-        [HttpPost("logout")]
-        public IActionResult Logout()
+        [HttpGet("/api/contacts/user/{id}")]
+        public IActionResult GetUser(string id)
         {
-
-            HttpContext.Session.Clear();
-            return NoContent();
+            var q = contacts.Get(id);
+            if (q == null)
+            {
+                return BadRequest();
+            }
+            return Ok(q);
         }
+
     }
 }

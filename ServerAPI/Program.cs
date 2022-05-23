@@ -1,3 +1,4 @@
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -14,12 +15,6 @@ builder.Services.AddCors(options =>
             builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
         });
 });
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-});
-
 
 var app = builder.Build();
 
@@ -32,7 +27,6 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("Allow All");
 app.UseAuthorization();
-app.UseSession();
 app.MapControllers();
 
 app.Run();

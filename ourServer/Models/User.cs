@@ -7,9 +7,7 @@ namespace ourServer.Models
         [Required]
         public string Id { get; set; }
         
-        [Range(8,12)]
         [Required]
-        [DataType(DataType.Password)]
         public string Password { get; set; }
 
         public string? Photo{ get; set; }

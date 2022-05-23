@@ -7,7 +7,7 @@ namespace ourServer.Models
     {
 
         [Required]
-        public string Id { get; set; } 
+        public string Id { get; set; }
 
         public string Name { get; set; }
 
@@ -20,7 +20,7 @@ namespace ourServer.Models
 
         [Required]
         [JsonIgnore]
-        public List<Message> Messages { get; set; }
+        public List<Message> Messages { get; set; } = new List<Message>();
 
     }
 }
