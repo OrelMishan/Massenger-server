@@ -1,26 +1,31 @@
-﻿using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using ourServer.Models;
 using ourServer.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
+//using Microsoft.AspNet.SignalR;
+using ServerAPI.Hubs;
+using Microsoft.AspNetCore.SignalR;
+
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace ServerAPI.Controllers
 {
     [EnableCors("Allow All")]
-    [Route("api/[controller]")]
+    [Route("api")]
     [ApiController]
     public class ContactsController : ControllerBase
     {
 
         private ContactService contacts = new ContactService();
+        private readonly IHubContext<ServerHub> hub;
 
+        public ContactsController(IHubContext<ServerHub> hub)
+        {
+            this.hub = hub;
+        }
         // GET: api/<ContactsController>
-        [HttpGet]
+        [HttpGet("contacts")]
         public IActionResult Get(string username)
         {
             var q = contacts.Get(username);
@@ -32,7 +37,7 @@ namespace ServerAPI.Controllers
         }
 
         // GET api/<ContactsController>/5
-        [HttpGet("{id}")]
+        [HttpGet("contacts/{id}")]
         public IActionResult Get(string id, string username)
         {
 
@@ -49,7 +54,7 @@ namespace ServerAPI.Controllers
         }
 
         // POST api/<ContactsController>
-        [HttpPost]
+        [HttpPost("contacts")]
         public IActionResult Post([FromBody] Contact add, string username)
         {
             var q = contacts.Get(username);
@@ -65,7 +70,7 @@ namespace ServerAPI.Controllers
         }
 
         // PUT api/<ContactsController>/5
-        [HttpPut("{id}")]
+        [HttpPut("contacts/{id}")]
         public IActionResult Put([FromBody] Contact edit, string username)
         {
             var q = contacts.Get(username);
@@ -85,7 +90,7 @@ namespace ServerAPI.Controllers
         }
 
         // DELETE api/<ContactsController>/5
-        [HttpDelete("{id}")]
+        [HttpDelete("contacts/{id}")]
         public IActionResult Delete(string id,string username)
         {
             var q = contacts.Get(username);
@@ -103,7 +108,7 @@ namespace ServerAPI.Controllers
 
         }
 
-        [HttpGet("{id}/messages")]
+        [HttpGet("contacts/{id}/messages")]
         public IActionResult GetMessages(string id, string username)
         {
             var q = contacts.Get(username);
@@ -118,8 +123,9 @@ namespace ServerAPI.Controllers
             return Ok(q.Contacts.Find(x => x.Id == id).Messages);
         }
 
-        [HttpPost("{id}/messages")]
-        public IActionResult sentMessage(string id, [FromBody] string content,string username){
+        [HttpPost("contacts/{id}/messages")]
+        public IActionResult sentMessage( string id, string username,[FromBody] messageContent content)
+        {
             var q = contacts.Get(username);
             if (q == null)
             {
@@ -129,13 +135,16 @@ namespace ServerAPI.Controllers
             {
                 return NotFound();
             }
-            Message add = new Message() { Content = content, Type = "text", Sent = true };
-            q.Contacts.Find(x => x.Id == id).Messages.Add(add);
-            return Created("{id}/messages",add);
+            Message add = new Message() { Content = content.Content, Type = "text", Sent = true };
+            var user = q.Contacts.Find(x => x.Id == id);
+            user.Messages.Add(add);
+            user.Last = content.Content;
+            user.Lastdate = DateTime.Now.ToString();
+            return Created("contacts/{id}/messages", add);
 
         }
 
-        [HttpGet("{id}/messages/{id2}")]
+        [HttpGet("contacts/{id}/messages/{id2}")]
         public IActionResult GetMessages(string id, int id2,string username)
         {
             var q = contacts.Get(username);
@@ -153,7 +162,7 @@ namespace ServerAPI.Controllers
             return Ok(q.Contacts.Find(x => x.Id == id).Messages.Find(x => x.Id == id2));
         }
 
-        [HttpPut("{id}/messages/{id2}")]
+        [HttpPut("contacts/{id}/messages/{id2}")]
         public IActionResult PutMessege(string id, int id2, [FromBody]string content, string username)
         {
             var q = contacts.Get(username);
@@ -173,7 +182,7 @@ namespace ServerAPI.Controllers
             return NoContent();
         }
 
-        [HttpDelete("{id}/messages/{id2}")]
+        [HttpDelete("contacts/{id}/messages/{id2}")]
         public IActionResult DelMessage(string id, int id2, string username)
         {
             var q = contacts.Get(username);
@@ -195,7 +204,7 @@ namespace ServerAPI.Controllers
         }
 
         [HttpPost("invitations")]
-        public IActionResult Invitation([FromBody] Invatation invatation)
+        public async Task<IActionResult> Invitation([FromBody] Invatation invatation)
         {
             Contact add = new Contact()
             {
@@ -213,11 +222,12 @@ namespace ServerAPI.Controllers
                 return BadRequest();
             }
             q.Contacts.Add(add);
+            await hub.Clients.All.SendAsync("ReceiveContact");
             return Created("invitations",add);
         }
 
         [HttpPost("transfer")]
-        public IActionResult Transfer([FromBody] Transfer message)
+        public async Task<IActionResult> Transfer([FromBody] Transfer message)
         {
             Message add = new Message()
             {
@@ -234,12 +244,16 @@ namespace ServerAPI.Controllers
             {
                 return BadRequest();
             }
-            q.Contacts.Find(x=>x.Id==message.From).Messages.Add(add);
+            var user = q.Contacts.Find(x=>x.Id==message.From);
+            user.Messages.Add(add);
+            user.Last = message.Content;
+            user.Lastdate = DateTime.Now.ToString();
+            await hub.Clients.All.SendAsync("ReceiveMessage");
             return Created("transfer", add);
         }
+        
 
-        [HttpPost]
-        [Route("/api/contacts/login")]
+        [HttpPost("contacts/login")]
         public IActionResult Login([FromBody] Login login)
         {
             var q = contacts.Get(login.Username);
@@ -270,11 +284,13 @@ namespace ServerAPI.Controllers
         public IActionResult GetUser(string id)
         {
             var q = contacts.Get(id);
+            var list = new List<User>();
+            list.Add(q);
             if (q == null)
             {
                 return BadRequest();
             }
-            return Ok(q);
+            return Ok(list);
         }
 
     }

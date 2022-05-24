@@ -19,8 +19,10 @@ namespace ourServer.Services
                new Contact()
                {
                    Id = "David",
+                   Name = "David",
                    Lastdate = DateTime.Now.ToString(),
                    Last = "Here's a pic!",
+                   Server = "localhost:5108",
                    Messages = new List<Message>()
                    {
                        new Message() { Sent = true, Type = "text", Content = "Hey, how are you?" },
@@ -31,8 +33,10 @@ namespace ourServer.Services
                new Contact()
                {
                    Id = "Sarah",
+                   Name = "Sarah",
                    Lastdate = "17/5/2022 18:46",
                    Last = "ParisSelfie.jpg",
+                   Server = "localhost:5108",
                    Messages = new List<Message>()
                    {
                        new Message() { Sent = true, Type = "text", Content = "Hey, how are you?" },
@@ -49,13 +53,14 @@ namespace ourServer.Services
                 Photo = "orel.jpg",
                 Name = "david",
                 Contacts =
-           new List<Contact>()
-           {
+                new List<Contact>() {
                new Contact()
                {
                    Id = "Orel",
+                   Name = "Orel",
                    Lastdate = "17/5/2022 18:46",
                    Last = "Here's a pic!",
+                   Server = "localhost:5108",
                    Messages = new List<Message>()
                    {
                        new Message() { Sent = true, Type = "text", Content = "Hey, how are you?" },
@@ -66,6 +71,34 @@ namespace ourServer.Services
                new Contact()
                {
                    Id = "Sarah",
+                   Name = "Sarah",
+                   Lastdate = "17/5/2022 18:46",
+                   Last = "ParisSelfie.jpg",
+                   Server = "localhost:5108",
+                   Messages = new List<Message>()
+                   {
+                       new Message() { Sent = true, Type = "text", Content = "Hey, how are you?" },
+                       new Message() { Sent = false, Type = "text", Content = "I'm great, i'm in Paris" },
+                       new Message() { Sent = false, Type = "text", Content = "ParisSelfie.jpg" }
+                   }
+               }
+           }
+            },
+            new User()
+            {
+                Id = "Moshe",
+                Password = "22222222",
+                Photo = "orel.jpg",
+                Name = "moshe",
+                Contacts =
+           new List<Contact>()
+           {
+               
+               new Contact()
+               {
+                   Id = "Sarah",
+                   Name = "Sarah",
+                   Server = "localhost:5108",
                    Lastdate = "17/5/2022 18:46",
                    Last = "ParisSelfie.jpg",
                    Messages = new List<Message>()

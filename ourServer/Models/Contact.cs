@@ -9,10 +9,10 @@ namespace ourServer.Models
         [Required]
         public string Id { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } 
 
         [Required]        
-        public string Server { get; set; } = "localhost:7169";
+        public string Server { get; set; } 
 
         public string Last { get; set; } = "";
 
@@ -22,5 +22,6 @@ namespace ourServer.Models
         [JsonIgnore]
         public List<Message> Messages { get; set; } = new List<Message>();
 
+      
     }
 }
