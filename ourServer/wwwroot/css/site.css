@@ -16,3 +16,20 @@ html {
 body {
   margin-bottom: 60px;
 }
+.chat-page-background {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    background-image: url("/BackgroundPic.jpg");
+    background-size: cover;
+}
+.app {
+    border-radius: 10px;
+    position: absolute;
+    padding: 1%;
+    left: 15%;
+    width: 70%;
+    top: 13%;
+    background-color: rgba(40, 44, 52, 0.00);
+    background-size: cover;
+}
