@@ -63,9 +63,9 @@ namespace ourServer.Services
                    Server = "localhost:5108",
                    Messages = new List<Message>()
                    {
-                       new Message() { Sent = true, Type = "text", Content = "Hey, how are you?" },
-                       new Message() { Sent = false, Type = "text", Content = "I'm great, i'm in Paris" },
-                       new Message() { Sent = false, Type = "text", Content = "Here's a pic!" }
+                       new Message() { Sent = false, Type = "text", Content = "Hey, how are you?" },
+                       new Message() { Sent = true, Type = "text", Content = "I'm great, i'm in Paris" },
+                       new Message() { Sent = true, Type = "text", Content = "Here's a pic!" }
                    }
                },
                new Contact()
@@ -90,25 +90,41 @@ namespace ourServer.Services
                 Password = "22222222",
                 Photo = "orel.jpg",
                 Name = "moshe",
+                Contacts = new List<Contact>()
+            },
+            new User()
+            {
+                Id = "Sarah",
+                Name = "Sarah",
+                 Password = "22222222",
+                Photo = "orel.jpg",
                 Contacts =
-           new List<Contact>()
-           {
-               
-               new Contact()
-               {
-                   Id = "Sarah",
-                   Name = "Sarah",
-                   Server = "localhost:5108",
-                   Lastdate = "17/5/2022 18:46",
-                   Last = "ParisSelfie.jpg",
-                   Messages = new List<Message>()
-                   {
-                       new Message() { Sent = true, Type = "text", Content = "Hey, how are you?" },
-                       new Message() { Sent = false, Type = "text", Content = "I'm great, i'm in Paris" },
-                       new Message() { Sent = false, Type = "text", Content = "ParisSelfie.jpg" }
-                   }
-               }
-           }
+                new List<Contact>() {
+                      new Contact() {
+                        Id = "Orel",
+                        Name = "Orel",
+                        Lastdate = "17/5/2022 18:46",
+                        Last = "Here's a pic!",
+                        Server = "localhost:5108",
+                        Messages = new List<Message>(){
+                           new Message() { Sent = false, Type = "text", Content = "Hey, how are you?" },
+                           new Message() { Sent = true, Type = "text", Content = "I'm great, i'm in Paris" },
+                           new Message() { Sent = true, Type = "text", Content = "ParisSelfie.jpg" }
+                         }
+                      },
+                      new Contact() {
+                       Id = "David",
+                       Name = "david",
+                       Server = "localhost:5108",
+                       Lastdate = "17/5/2022 18:46",
+                       Last = "ParisSelfie.jpg",
+                       Messages = new List<Message>(){
+                           new Message() { Sent = false, Type = "text", Content = "Hey, how are you?" },
+                           new Message() { Sent = true, Type = "text", Content = "I'm great, i'm in Paris" },
+                           new Message() { Sent = true, Type = "text", Content = "ParisSelfie.jpg" }
+                       }
+                      }
+                }
             }
         };
 
@@ -122,7 +138,6 @@ namespace ourServer.Services
             return users.Find(x => x.Id == id);
         }
 
-        
         public void Delete(string id)
         {
             users.Remove(Get(id));
