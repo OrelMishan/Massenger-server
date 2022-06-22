@@ -5,6 +5,10 @@ using Microsoft.AspNetCore.Cors;
 //using Microsoft.AspNet.SignalR;
 using ServerAPI.Hubs;
 using Microsoft.AspNetCore.SignalR;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using FirebaseAdmin.Messaging;
+using Message = ourServer.Models.Message;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -23,6 +27,8 @@ namespace ServerAPI.Controllers
         public ContactsController(IHubContext<ServerHub> hub)
         {
             this.hub = hub;
+           
+
         }
         // GET: api/<ContactsController>
         [HttpGet("contacts")]
@@ -249,6 +255,30 @@ namespace ServerAPI.Controllers
             user.Last = message.Content;
             user.Lastdate = DateTime.Now.ToString();
             await hub.Clients.All.SendAsync("ReceiveMessage");
+            if (FirebaseApp.DefaultInstance == null)
+            {
+                FirebaseApp.Create(new AppOptions()
+                {
+                    Credential = GoogleCredential.FromFile("private_key.json")
+
+                });
+            }
+            if (q.Token != null)
+            {
+                var registrationToken = q.Token;
+                    var fbmessage = new FirebaseAdmin.Messaging.Message()
+                {
+
+                    Token = registrationToken,
+                    Notification = new Notification()
+                    {
+                        Title = message.From.ToString(),
+                        Body = message.Content.ToString()
+                    }
+                };
+                string response =
+                    FirebaseMessaging.DefaultInstance.SendAsync(fbmessage).Result;
+            }
             return Created("transfer", add);
         }
         
@@ -265,6 +295,7 @@ namespace ServerAPI.Controllers
             {
                 return NotFound();
             }
+            q.Token = login.Token;
             return NoContent();
         }
 
@@ -276,6 +307,7 @@ namespace ServerAPI.Controllers
             {
                 return BadRequest();
             }
+            add.Contacts = new List<Contact>();
             contacts.Add(add);
             return Created("register", add);
         }

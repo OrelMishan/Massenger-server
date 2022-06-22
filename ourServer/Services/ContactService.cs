@@ -90,7 +90,7 @@ namespace ourServer.Services
                 Password = "22222222",
                 Photo = "orel.jpg",
                 Name = "moshe",
-                Contacts = new List<Contact>()
+                Contacts = new List<Contact>(){}
             },
             new User()
             {

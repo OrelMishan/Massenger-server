@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace ourServer.Models
 {
@@ -15,6 +16,8 @@ namespace ourServer.Models
         [Required]
         public string Name { get; set; }
 
+        [JsonIgnore]
+        public string? Token { get; set; }
         public List<Contact> Contacts { get; set; } = new List<Contact>();
 
         
